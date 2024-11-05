@@ -1,12 +1,36 @@
-import React from 'react'
+import React from "react";
+import { useLocation } from "react-router-dom";
+import { ReactComponent as MoonIcon } from "../assets/moon.svg";
+import { ReactComponent as SunIcon } from "../assets/sun.svg";
+import { ReactComponent as LogoutIcon } from "../assets/logout.svg";
 
-const Header = () => {
+export default function Header({ onLogout, isAuthenticated, theme, toggleTheme }) {
+  const location = useLocation();
 
-    return (
-        <div className="app-header">
-            <h1>TODO List</h1>
-        </div>
-    )
+  let title = "My Notes";
+  if (location.pathname === "/login") {
+    title = "Login";
+  } else if (location.pathname === "/register") {
+    title = "Register";
+  }
+
+  const isAuthPage = location.pathname === "/login" || location.pathname === "/register";
+
+  return (
+    <div className="app-header">
+      <h1>{title}</h1>
+      <div className="header-icons">
+        {/* Переключатель темы */}
+        <button onClick={toggleTheme} className="theme-toggle">
+          {theme === "light" ? <MoonIcon /> : <SunIcon />}
+        </button>
+        {/* Кнопка выхода для авторизованных пользователей */}
+        {isAuthenticated && !isAuthPage && (
+          <button onClick={onLogout} className="logout-button">
+            <LogoutIcon />
+          </button>
+        )}
+      </div>
+    </div>
+  );
 }
-
-export default Header

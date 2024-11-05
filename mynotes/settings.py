@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'rest_framework',
     "corsheaders",
     'webpush',
+    'webauthn',
 ]
 
 MIDDLEWARE = [
@@ -103,8 +104,26 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
+
 WEBPUSH_SETTINGS = {
     "VAPID_PUBLIC_KEY": "BEjZrzG9pAo8KI1mt1fl0fZUYkL6cezhYhulAgisHa-zfrt1qNqYvSfqtHAWYGGY9wiT8ZUwhkIIHImstVuOmY4",
     "VAPID_PRIVATE_KEY": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgIBGIY9jF4_GzAVQaWYl1p7NNtwNAiJ_FawiiVHDT-kChRANCAARI2a8xvaQKPCiNZrdX5dH2VGJC-nHs4WIbpQIIrB2vs367dajamL0n6rRwFmBhmPcIk_GVMIZCCByJrLVbjpmO",
     "VAPID_ADMIN_EMAIL": "gasimoweltun@gmail.com"
 }
+
+WEBAUTHN_RP_NAME = "TodoListApp"
+WEBAUTHN_RP_ID = "127.0.0.1"  # Измените на домен, если разворачиваете на продакшене
+WEBAUTHN_RP_ORIGIN = "http://127.0.0.1:8000"  # Замените на https://<ваш_домен> для продакшена
+
+
+FIDO2_RP_NAME = "TodoListApp"  # Название вашего приложения
+FIDO2_RP_ID = "localhost"      # Обычно домен приложения (например, example.com)

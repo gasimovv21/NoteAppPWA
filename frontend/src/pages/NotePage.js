@@ -6,7 +6,7 @@ import { ReactComponent as ShareIcon } from '../assets/share.svg';
 const NotePage = () => {
     const { id } = useParams();
     const history = useHistory();
-    const [note, setNote] = useState(null);
+    const [note, setNote] = useState({ body: '' });
 
     useEffect(() => {
         getNote();
@@ -15,16 +15,26 @@ const NotePage = () => {
     const getNote = async () => {
         if (id === 'new') return;
         
-        const response = await fetch(`/api/notes/${id}/`);
-        const data = await response.json();
-        setNote(data);
+        const response = await fetch(`/api/notes/${id}/`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            setNote(data);
+        } else if (response.status === 403) {
+            alert("You do not have permission to view this note.");
+            history.push('/');
+        }
     };
 
     const createNote = async () => {
         await fetch(`/api/notes/`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
             body: JSON.stringify(note)
         });
@@ -34,7 +44,8 @@ const NotePage = () => {
         await fetch(`/api/notes/${id}/`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
             body: JSON.stringify(note)
         });
@@ -44,37 +55,62 @@ const NotePage = () => {
         await fetch(`/api/notes/${id}/`, {
             method: 'DELETE',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
         });
         history.push('/');
     };
 
     const handleSubmit = () => {
-        if (id !== 'new' && !note.body) {
+        if (!note?.body) {
             deleteNote();
-        } else if (id !== 'new') {
-            updateNote();
-        } else if (id === 'new' && note) {
+        } else if (id === 'new') {
             createNote();
+        } else {
+            updateNote();
         }
         history.push('/');
     };
 
-    // Функция для шаринга заметки
-    const shareNote = () => {
+    // Делим текст на заголовок и тело
+    const splitText = note?.body?.split('\n');
+    const title = splitText?.[0] || '';
+    const body = splitText?.slice(1).join('\n') || '';
+
+    const shareNote = async () => {
         if (navigator.share) {
-            navigator.share({
-                title: `Заметка: ${note.title || 'Без названия'}`,
-                text: note.body,
-                url: window.location.href
-            })
-            .then(() => console.log('The note was successfully shared'))
-            .catch((error) => console.error('Error when sharing notes:', error));
+            // Преобразование note_id в base64 для безопасной передачи в URL
+            const base64Id = btoa(id.toString());
+    
+            const response = await fetch(`/api/notes/shared/create/${base64Id}/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+    
+            if (response.ok) {
+                const data = await response.json();
+                const sharedUrl = `${window.location.origin}/notes/shared/${data.shared_id}`;
+                
+                navigator.share({
+                    title: title || 'Shared Note',
+                    text: body,
+                    url: sharedUrl
+                })
+                .then(() => console.log('The note was successfully shared'))
+                .catch((error) => console.error('Error when sharing notes:', error));
+            } else {
+                console.error("Failed to create shared note:", response.statusText);
+            }
         } else {
             alert("Your browser does not support the sharing feature.");
         }
     };
+    
+    
 
     return (
         <div className="note">
@@ -82,17 +118,23 @@ const NotePage = () => {
                 <h3>
                     <ArrowLeft onClick={handleSubmit} />
                 </h3>
-                <button onClick={handleSubmit}>Save</button>
+                {id !== 'new' ? (
+                    <button onClick={deleteNote}>Delete</button>
+                ) : (
+                    <button onClick={handleSubmit}>Done</button>
+                )}
             </div>
             <textarea
                 onChange={(e) => setNote({ ...note, body: e.target.value })}
-                value={note?.body}
+                value={note?.body || ''}
+                style={{ whiteSpace: 'pre-wrap' }} // сохраняем переносы строк
             ></textarea>
 
-            {/* Кнопка для шаринга с иконкой */}
-            <button onClick={shareNote} className="share-button">
-                <ShareIcon />
-            </button>
+            {id !== 'new' && (
+                <button onClick={shareNote} className="share-button">
+                    <ShareIcon />
+                </button>
+            )}
         </div>
     );
 };

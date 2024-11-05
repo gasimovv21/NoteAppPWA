@@ -73,6 +73,26 @@ a {
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+.theme-toggle,
+.logout-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.theme-toggle svg,
+.logout-button svg {
+  width: 24px;
+  height: 24px;
+  fill: var(--color-text);
+}
+
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .app-header h1 {
   font-size: 30px;
   color: var(--color-dark);
@@ -141,21 +161,25 @@ a {
   cursor: pointer;
 }
 
-.notes-list-item h3,
-.notes-list-item p span {
-  font-weight: 600;
-}
-
-.notes-list-item p span {
-  color: var(--color-gray);
-  display: inline-block;
-  margin-right: 8px;
+.notes-list-item h3 {
+  font-weight: bold; /* Жирный заголовок для первой строки */
+  font-size: 16px;
+  color: var(--color-text);
+  margin-bottom: 4px;
 }
 
 .notes-list-item p {
   font-size: 14px;
   color: var(--color-light);
 }
+
+.notes-list-item p span {
+  color: var(--color-gray);
+  font-weight: 600;
+  display: inline-block;
+  margin-right: 8px;
+}
+
 
 .floating-button {
   font-size: 48px;
@@ -244,4 +268,134 @@ a {
   width: 24px;
   height: 24px;
   fill: var(--color-main);
+}
+
+
+/* Основной контейнер для логина */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Занимает всю высоту окна */
+  background-color: var(--color-bg);
+  overflow: hidden; /* Отключает прокрутку */
+  margin: 0;
+}
+
+/* Убираем отступы у body и html */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%; /* Занимает всю высоту экрана */
+  overflow: hidden; /* Убираем прокрутку */
+}
+
+
+/* Форма логина */
+.login-form {
+  background-color: var(--color-white);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+/* Заголовок логина */
+.login-form h1 {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--color-dark);
+  margin-bottom: 20px;
+}
+
+/* Поля ввода */
+.input-field {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 2px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: var(--color-lighter);
+  color: var(--color-text);
+}
+
+.input-field:focus {
+  border-color: var(--color-main);
+  outline: none;
+}
+
+/* Кнопка логина */
+.login-button {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--color-main);
+  color: var(--color-white);
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+.login-button:disabled {
+  background-color: var(--color-light);
+  cursor: not-allowed;
+}
+
+
+
+/* REGISTER FORM */
+
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: var(--color-bg);
+}
+
+.form-container {
+  background-color: var(--color-dark);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+}
+
+.form-container h2 {
+  color: var(--color-white);
+  margin-bottom: 1.5rem;
+}
+
+.form-container input {
+  width: 100%;
+  padding: 0.8rem;
+  margin: 0.5rem 0;
+  border-radius: 5px;
+  border: none;
+  background-color: var(--color-lighter);
+  color: var(--color-dark);
+  font-size: 1rem;
+}
+
+.form-container button {
+  width: 100%;
+  padding: 0.8rem;
+  margin-top: 1rem;
+  background-color: var(--color-main);
+  color: var(--color-white);
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.form-container button:hover {
+  background-color: darken(var(--color-main), 10%);
 }

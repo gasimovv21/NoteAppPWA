@@ -1,23 +1,41 @@
-import React, { useState, useEffect } from 'react'
-import ListItem from '../components/ListItem'
-import AddButton from '../components/AddButton'
-
+import React, { useState, useEffect } from 'react';
+import ListItem from '../components/ListItem';
+import AddButton from '../components/AddButton';
 
 const NotesListPage = () => {
-
-    let [notes, setNotes] = useState([])
+    const [notes, setNotes] = useState([]);
+    const [error, setError] = useState(null);  // Для отслеживания ошибок
 
     useEffect(() => {
-        getNotes()
-    }, [])
+        getNotes();
+    }, []);
 
+    const getNotes = async () => {
+        const token = localStorage.getItem('token');  // Получаем токен из localStorage
 
-    let getNotes = async () => {
+        try {
+            const response = await fetch('/api/notes/', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`  // Добавляем токен в заголовок
+                }
+            });
 
-        let response = await fetch('/api/notes/')
-        let data = await response.json()
-        setNotes(data)
-    }
+            if (response.ok) {
+                const data = await response.json();
+                setNotes(data);
+            } else if (response.status === 401) {
+                setError('Unauthorized access. Please log in again.');  // Устанавливаем ошибку
+                setNotes([]);  // Очищаем список заметок
+            } else {
+                setError('Failed to fetch notes.');
+            }
+        } catch (error) {
+            setError('An error occurred while fetching notes.');
+            console.error(error);
+        }
+    };
 
     return (
         <div className="notes">
@@ -26,14 +44,22 @@ const NotesListPage = () => {
                 <p className="notes-count">{notes.length}</p>
             </div>
 
-            <div className="notes-list">
-                {notes.map((note, index) => (
-                    <ListItem key={index} note={note} />
-                ))}
-            </div>
+            {error ? (  // Отображаем ошибку, если есть
+                <p className="error-message">{error}</p>
+            ) : (
+                <div className="notes-list">
+                    {notes.length > 0 ? (
+                        notes.map((note, index) => (
+                            <ListItem key={index} note={note} />
+                        ))
+                    ) : (
+                        <p>No notes available.</p>
+                    )}
+                </div>
+            )}
             <AddButton />
         </div>
-    )
-}
+    );
+};
 
-export default NotesListPage
+export default NotesListPage;
