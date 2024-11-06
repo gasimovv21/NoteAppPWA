@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { ReactComponent as ArrowLeft } from '../assets/arrow-left.svg';
 import { ReactComponent as ShareIcon } from '../assets/share.svg';
+import loadingIcon from '../assets/loading.svg';
 
 const NotePage = () => {
     const { id } = useParams();
     const history = useHistory();
-    const [note, setNote] = useState({ body: '' });
+    const [note, setNote] = useState({ body: '', deadline: '' });
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         getNote();
@@ -14,7 +16,7 @@ const NotePage = () => {
 
     const getNote = async () => {
         if (id === 'new') return;
-        
+
         const response = await fetch(`/api/notes/${id}/`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -36,7 +38,7 @@ const NotePage = () => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
-            body: JSON.stringify(note)
+            body: JSON.stringify({ body: note.body, deadline: note.deadline || null })
         });
     };
 
@@ -47,11 +49,12 @@ const NotePage = () => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
-            body: JSON.stringify(note)
+            body: JSON.stringify({ body: note.body, deadline: note.deadline || null })
         });
     };
 
     const deleteNote = async () => {
+        setIsLoading(true);
         await fetch(`/api/notes/${id}/`, {
             method: 'DELETE',
             headers: {
@@ -59,10 +62,14 @@ const NotePage = () => {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
         });
-        history.push('/');
+        setTimeout(() => {
+            setIsLoading(false);
+            history.push('/');
+        }, 500);
     };
 
     const handleSubmit = () => {
+        setIsLoading(true);
         if (!note?.body) {
             deleteNote();
         } else if (id === 'new') {
@@ -70,19 +77,15 @@ const NotePage = () => {
         } else {
             updateNote();
         }
-        history.push('/');
+        setTimeout(() => {
+            setIsLoading(false);
+            history.push('/');
+        }, 500);
     };
-
-    // Делим текст на заголовок и тело
-    const splitText = note?.body?.split('\n');
-    const title = splitText?.[0] || '';
-    const body = splitText?.slice(1).join('\n') || '';
 
     const shareNote = async () => {
         if (navigator.share) {
-            // Преобразование note_id в base64 для безопасной передачи в URL
             const base64Id = btoa(id.toString());
-    
             const response = await fetch(`/api/notes/shared/create/${base64Id}/`, {
                 method: 'POST',
                 headers: {
@@ -90,14 +93,14 @@ const NotePage = () => {
                     'Content-Type': 'application/json'
                 }
             });
-    
+
             if (response.ok) {
                 const data = await response.json();
-                const sharedUrl = `${window.location.origin}/notes/shared/${data.shared_id}`;
+                const sharedUrl = `${window.location.origin}/#/notes/shared/${data.shared_id}`;
                 
                 navigator.share({
-                    title: title || 'Shared Note',
-                    text: body,
+                    title: note.body.split('\n')[0] || 'Shared Note',
+                    text: note.body,
                     url: sharedUrl
                 })
                 .then(() => console.log('The note was successfully shared'))
@@ -109,8 +112,6 @@ const NotePage = () => {
             alert("Your browser does not support the sharing feature.");
         }
     };
-    
-    
 
     return (
         <div className="note">
@@ -124,16 +125,30 @@ const NotePage = () => {
                     <button onClick={handleSubmit}>Done</button>
                 )}
             </div>
-            <textarea
-                onChange={(e) => setNote({ ...note, body: e.target.value })}
-                value={note?.body || ''}
-                style={{ whiteSpace: 'pre-wrap' }} // сохраняем переносы строк
-            ></textarea>
-
+            
             {id !== 'new' && (
                 <button onClick={shareNote} className="share-button">
                     <ShareIcon />
                 </button>
+            )}
+            
+            <textarea
+                onChange={(e) => setNote({ ...note, body: e.target.value })}
+                value={note?.body || ''}
+                style={{ whiteSpace: 'pre-wrap' }}
+            ></textarea>
+
+            <input
+                type="date"
+                value={note.deadline || ''}
+                onChange={(e) => setNote({ ...note, deadline: e.target.value })}
+                className="date-picker"
+            />
+
+            {isLoading && (
+                <div className="loading-overlay">
+                    <img src={loadingIcon} alt="Loading..." className="loading-icon" />
+                </div>
             )}
         </div>
     );

@@ -15,22 +15,30 @@ def getNoteDetail(request, pk):
 def createNote(request):
     data = request.data
     note = Note.objects.create(
-        user=request.user,  # Устанавливаем текущего пользователя как владельца
-        body=data['body']
+        user=request.user,
+        body=data['body'],
+        deadline=data.get('deadline')  # Устанавливаем дедлайн, если он передан
     )
     serializer = NoteSerializer(note, many=False)
     return Response(serializer.data)
 
 
+
 def updateNote(request, pk):
     data = request.data
     note = Note.objects.get(id=pk, user=request.user)
-    serializer = NoteSerializer(instance=note, data=data)
 
-    if serializer.is_valid():
-        serializer.save()
+    # Обновляем текст заметки
+    note.body = data['body']
 
-    # Оборачиваем результат в Response
+    # Обновляем или удаляем дедлайн в зависимости от переданных данных
+    if 'deadline' in data:
+        note.deadline = data['deadline'] if data['deadline'] else None
+    else:
+        note.deadline = None  # Удаляем дедлайн, если он не передан
+
+    note.save()  # Сохраняем изменения
+    serializer = NoteSerializer(note, many=False)
     return Response(serializer.data)
 
 

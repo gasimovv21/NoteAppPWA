@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { HashRouter as Router, Route, Redirect } from "react-router-dom";
+import { HashRouter as Router, Route, Redirect, Switch, useHistory } from "react-router-dom";
 
 import './App.css';
 import Header from './components/Header';
@@ -13,6 +13,7 @@ import SharedNote from './pages/SharedNote';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+  const history = useHistory(); // добавляем useHistory для управления навигацией
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -38,6 +39,7 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     setIsAuthenticated(false);
+    history.push('/login'); // Перенаправляем на страницу /login после выхода
   };
 
   return (
@@ -50,26 +52,39 @@ function App() {
             theme={theme} 
             toggleTheme={toggleTheme} 
           />
-          <Route path="/" exact>
-            {isAuthenticated ? <NotesListPage /> : <Redirect to="/login" />}
-          </Route>
-          <Route path="/note/:id">
-            {isAuthenticated ? <NotePage /> : <Redirect to="/login" />}
-          </Route>
-          <Route path="/login">
-            {isAuthenticated ? <Redirect to="/" /> : <LoginPage onLogin={handleLogin} />}
-          </Route>
-          <Route path="/register">
-            {isAuthenticated ? <Redirect to="/" /> : <RegisterPage />}
-          </Route>
-          <Route 
-              path="/notes/shared/:shared_id" 
-              render={(props) => {
-                  console.log("Route to SharedNote matched", props.match.params);
-                  return <SharedNote {...props} />;
-              }}
-          />
+          <Switch>
+            {/* Redirect root (/) to login if unauthenticated */}
+            <Route exact path="/">
+              {isAuthenticated ? <Redirect to="/notes" /> : <Redirect to="/login" />}
+            </Route>
 
+            <Route path="/login">
+              {isAuthenticated ? <Redirect to="/notes" /> : <LoginPage onLogin={handleLogin} />}
+            </Route>
+
+            <Route path="/register">
+              {isAuthenticated ? <Redirect to="/notes" /> : <RegisterPage />}
+            </Route>
+
+            {/* Other routes that require authentication */}
+            <Route path="/notes" exact>
+              {isAuthenticated ? <NotesListPage /> : <Redirect to="/login" />}
+            </Route>
+            <Route path="/note/:id">
+              {isAuthenticated ? <NotePage /> : <Redirect to="/login" />}
+            </Route>
+            <Route 
+              path="/notes/shared/:shared_id" 
+              render={(props) => (
+                  <SharedNote {...props} />
+              )}
+            />
+
+            {/* Catch-all route to redirect to /login if path not found */}
+            <Route path="*">
+              <Redirect to="/login" />
+            </Route>
+          </Switch>
         </div>
       </div>
     </Router>

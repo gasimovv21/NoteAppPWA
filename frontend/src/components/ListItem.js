@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-let getTime = (note) => {
-    return new Date(note.updated).toLocaleDateString();
+let getTime = (date) => {
+    return new Date(date).toLocaleDateString();
 };
 
 let getTitle = (note) => {
@@ -29,10 +29,9 @@ const ListItem = ({ note }) => {
     return (
         <Link to={`/note/${note.id}`}>
             <div className="notes-list-item">
-                {/* Заголовок отображается жирным шрифтом */}
                 <h3 style={{ fontWeight: 'bold' }}>{getTitle(note)}</h3>
-                {/* Оставшаяся часть текста обычным шрифтом */}
-                <p><span>{getTime(note)}</span> {getContent(note)}</p>
+                <p><span>Created: {getTime(note.created)}</span> {getContent(note)}</p>
+                <p>Deadline: {note.deadline ? getTime(note.deadline) : 'No deadline'}</p>
             </div>
         </Link>
     );

@@ -1,7 +1,8 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 from .models import Note
 
-class NoteSerializer(ModelSerializer):
+class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
-        fields = ['id', 'body', 'created', 'updated']  # Если нужно, добавьте поле user
+        fields = ['id', 'user', 'body', 'deadline', 'created', 'updated']  # Включите deadline
+

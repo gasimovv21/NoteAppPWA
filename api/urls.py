@@ -13,6 +13,10 @@ urlpatterns = [
     path('notes/shared/<str:shared_id>/', views.shared_note_view, name='shared_note'),
     path('notes/shared/save/<str:shared_id>/', views.save_shared_note_as_new, name="save_shared_note_as_new"),
 
+    path('user/', views.get_user_info, name='user_info'),
+    path('user/<int:user_id>/', views.get_user_info_by_id, name='user_info_by_id'),
+
+
     path('webauthn/register/options', views.webauthn_register_options, name='webauthn_register_options'),
     path('webauthn/register/verify', views.webauthn_register_verify, name='webauthn_register_verify'),
     path('webauthn/authenticate/options', views.webauthn_authenticate_options, name='webauthn_authenticate_options'),

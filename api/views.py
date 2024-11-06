@@ -35,6 +35,22 @@ from django.http import JsonResponse
 User = get_user_model()
 
 
+def send_test_notification(request):
+    user = User.objects.get(username="admin")  # Укажите имя пользователя для теста
+    payload = {
+        "title": "Тестовое уведомление",
+        "body": "Это тестовое уведомление для проверки",
+    }
+    send_user_notification(user=user, payload=payload, ttl=1000)
+    return JsonResponse({"status": "Тестовое уведомление отправлено"})
+
+
+@csrf_exempt
+def trigger_test_notification(request):
+    send_test_notification()
+    return JsonResponse({"status": "Уведомление отправлено"})
+
+
 @csrf_exempt
 def register(request):
     if request.method == 'POST':
@@ -70,6 +86,21 @@ def getRoutes(request):
         {'Endpoint': '/notes/id/delete/', 'method': 'DELETE', 'body': None, 'description': 'Deletes a note'},
     ]
     return Response(routes)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_info(request):
+    user = request.user
+    return JsonResponse({"username": user.username}, status=200)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_user_info_by_id(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    return JsonResponse({"username": user.username}, status=200)
+
 
 @csrf_exempt
 @api_view(['GET', 'POST'])
@@ -133,26 +164,18 @@ def delete_shared_note_after_timeout(shared_id, timeout=30):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_shared_link(request, pk):
-    """
-    Создает ссылку на заметку, доступную для общего просмотра, и возвращает ее.
-    """
     try:
-        # Декодируем base64 параметр для получения id заметки
         decoded_id = base64.urlsafe_b64decode(pk).decode("utf-8")
         note_id = int(decoded_id)
-        
-        # Проверяем, что пользователь является автором заметки
         note = get_object_or_404(Note, id=note_id, user=request.user)
 
-        # Создаем или получаем ссылку на заметку
         shared_note, created = SharedNote.objects.get_or_create(note=note, author=request.user)
-        
-        # Запускаем поток для удаления ссылки через 30 секунд
+
         thread = threading.Thread(target=delete_shared_note_after_timeout, args=(shared_note.shared_id,))
         thread.start()
 
-        # Возвращаем shared_id, который будет использоваться в URL для доступа к заметке
-        return Response({"shared_id": shared_note.shared_id}, status=status.HTTP_201_CREATED)
+        shared_url = f"{request.build_absolute_uri('/')[:-1]}#/notes/shared/{shared_note.shared_id}"
+        return Response({"shared_id": shared_note.shared_id, "url": shared_url}, status=status.HTTP_201_CREATED)
 
     except (ValueError, Note.DoesNotExist, base64.binascii.Error) as e:
         return Response({"error": "Invalid note or access denied."}, status=status.HTTP_400_BAD_REQUEST)
@@ -165,10 +188,10 @@ def save_shared_note_as_new(request, shared_id):
         shared_note = SharedNote.objects.get(shared_id=shared_id)
         note_to_copy = shared_note.note
 
-        # Создаем новую заметку с тем же контентом для текущего пользователя
         new_note = Note.objects.create(
             body=note_to_copy.body,
-            user=request.user
+            user=request.user,
+            deadline=note_to_copy.deadline  # Копируем deadline
         )
 
         return Response({"message": "Note successfully saved."}, status=status.HTTP_201_CREATED)
@@ -181,22 +204,40 @@ def subscribe(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         subscription_info = data.get('subscription')
+        
+        # Логирование данных для проверки
+        print("Received subscription info:", subscription_info)
+        
         user = request.user
-
         if not user.is_authenticated:
+            print("User not authenticated")  # Лог для отладки
             return JsonResponse({'error': 'User not authenticated'}, status=401)
-
-        # Сохраняем или обновляем данные подписки
-        subscription, created = Subscription.objects.get_or_create(user=user)
-        subscription.subscription_info = subscription_info
-        subscription.save()
-
+        
+        # Проверка существования подписки, и обновление
+        subscription, created = Subscription.objects.update_or_create(
+            user=user,
+            defaults={'subscription_info': subscription_info}  # Обновление подписки
+        )
+        
+        print(f"Subscription updated for user {user.username}, created: {created}")
         return JsonResponse({'message': 'Subscription saved.'})
 
 
+
 def send_push_notification(user, title, message):
-    payload = {"head": title, "body": message}
-    send_user_notification(user=user, payload=payload, ttl=1000)
+    payload = {
+        "title": title,
+        "body": message,
+        "icon": "/static/media/logo192.png",
+        "url": "/notes",
+    }
+    try:
+        print(f"Sending push notification to {user.username} with payload: {payload}")
+        send_user_notification(user=user, payload=payload, ttl=1000)
+        print("Уведомление отправлено успешно:", payload)
+    except Exception as e:
+        print("Ошибка отправки уведомления:", e)
+
 
 
 # Настройки сервера FIDO2

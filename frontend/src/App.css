@@ -152,8 +152,8 @@ a {
 .notes-list-item {
   border-bottom: 1px solid var(--color-border);
   margin-bottom: 12px;
-  padding: 8px 16px;
-  transition: all 0.2s ease-in-out;
+  padding: 12px 16px;
+  transition: background-color 0.2s ease-in-out;
 }
 
 .notes-list-item:hover {
@@ -162,7 +162,7 @@ a {
 }
 
 .notes-list-item h3 {
-  font-weight: bold; /* Жирный заголовок для первой строки */
+  font-weight: bold;
   font-size: 16px;
   color: var(--color-text);
   margin-bottom: 4px;
@@ -171,13 +171,12 @@ a {
 .notes-list-item p {
   font-size: 14px;
   color: var(--color-light);
+  margin: 2px 0;
 }
 
 .notes-list-item p span {
   color: var(--color-gray);
   font-weight: 600;
-  display: inline-block;
-  margin-right: 8px;
 }
 
 
@@ -398,4 +397,92 @@ html, body {
 
 .form-container button:hover {
   background-color: darken(var(--color-main), 10%);
+}
+
+
+/* LOADING LOG REG*/
+
+
+
+.loading-overlay-log-reg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.loading-spinner-log-reg {
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+}
+
+/* LOADING LOG REG*/
+
+
+/* LOADING DONE DELETE*/
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loading-icon {
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+}
+
+/* LOADING DONE DELETE*/
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+.date-picker {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  margin-top: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+
+/* Стили для кнопки назад */
+.back-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.back-button svg {
+  width: 24px;
+  height: 24px;
+  fill: var(--color-main);
+}
+
+/* Заголовок для Shared Note */
+.shared-note-title {
+  font-size: 18px;
+  color: var(--color-text);
+  font-weight: bold;
+  margin: 0 8px;
 }

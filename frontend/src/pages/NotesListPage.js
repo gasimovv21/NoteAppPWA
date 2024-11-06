@@ -4,21 +4,21 @@ import AddButton from '../components/AddButton';
 
 const NotesListPage = () => {
     const [notes, setNotes] = useState([]);
-    const [error, setError] = useState(null);  // Для отслеживания ошибок
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         getNotes();
     }, []);
 
     const getNotes = async () => {
-        const token = localStorage.getItem('token');  // Получаем токен из localStorage
+        const token = localStorage.getItem('token');
 
         try {
             const response = await fetch('/api/notes/', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`  // Добавляем токен в заголовок
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
@@ -26,8 +26,8 @@ const NotesListPage = () => {
                 const data = await response.json();
                 setNotes(data);
             } else if (response.status === 401) {
-                setError('Unauthorized access. Please log in again.');  // Устанавливаем ошибку
-                setNotes([]);  // Очищаем список заметок
+                setError('Unauthorized access. Please log in again.');
+                setNotes([]);
             } else {
                 setError('Failed to fetch notes.');
             }
@@ -44,7 +44,7 @@ const NotesListPage = () => {
                 <p className="notes-count">{notes.length}</p>
             </div>
 
-            {error ? (  // Отображаем ошибку, если есть
+            {error ? (
                 <p className="error-message">{error}</p>
             ) : (
                 <div className="notes-list">

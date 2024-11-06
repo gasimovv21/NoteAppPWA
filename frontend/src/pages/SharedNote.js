@@ -1,41 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
+import { ReactComponent as ArrowLeft } from '../assets/arrow-left.svg';
 import { ReactComponent as AddIcon } from '../assets/add.svg';
 
 const SharedNote = () => {
-    const { shared_id } = useParams();  
+    const { shared_id } = useParams();
     const history = useHistory();
     const [note, setNote] = useState(null);
+    const [author, setAuthor] = useState('');
 
     useEffect(() => {
-        console.log("SharedNote component mounted");
-        console.log("shared_id:", shared_id);
-
         if (shared_id) {
             getSharedNote();
-        } else {
-            console.error("shared_id is missing");
         }
     }, [shared_id]);
 
     const getSharedNote = async () => {
         try {
-            console.log(`Fetching shared note with id: ${shared_id}`);
             const response = await fetch(`/api/notes/shared/${shared_id}/`);
             if (response.ok) {
                 const data = await response.json();
-                console.log('Fetched shared note data:', data);
                 setNote(data);
+
+                // Запрос к серверу для получения имени автора
+                const authorResponse = await fetch(`/api/user/${data.user}/`);
+                if (authorResponse.ok) {
+                    const authorData = await authorResponse.json();
+                    setAuthor(authorData.username); // Устанавливаем имя автора
+                } else {
+                    console.error("Failed to fetch author information");
+                }
             } else {
-                console.error('Failed to load shared note:', response.status, response.statusText);
                 alert("Shared note not found or access denied.");
+                history.push('/login'); // Перенаправление на страницу входа при ошибке доступа
             }
         } catch (error) {
             console.error("Error fetching shared note:", error);
         }
     };
 
-    const saveNoteForUser = async () => {
+    const saveNote = async () => {
         try {
             const response = await fetch(`/api/notes/shared/save/${shared_id}/`, {
                 method: 'POST',
@@ -46,25 +50,37 @@ const SharedNote = () => {
             });
 
             if (response.ok) {
-                alert("Note saved to your profile.");
-                history.push('/');
+                alert("Note saved successfully.");
+                history.push('/notes');
             } else {
-                console.error("Failed to save note:", response.statusText);
+                console.error("Failed to save the shared note.");
             }
         } catch (error) {
-            console.error("Error saving note:", error);
+            console.error("Error saving shared note:", error);
         }
     };
 
     return (
         <div className="note">
-            <h3>Shared Note</h3>
-            <textarea 
-                value={note?.body || 'No content available'} 
-                readOnly 
-                style={{ width: "100%", height: "200px" }} 
+            <div className="note-header">
+                {/* Кнопка назад возвращает на домашнюю страницу */}
+                <button onClick={() => history.push('/notes')} className="back-button">
+                    <ArrowLeft />
+                </button>
+                <h3 className="shared-note-title">Shared Note by {author}</h3>
+            </div>
+
+            <textarea
+                value={note?.body || 'No content available'}
+                readOnly
+                style={{ width: '100%', height: '200px', marginBottom: '10px' }}
             ></textarea>
-            <button onClick={saveNoteForUser}>
+
+            {note?.deadline && (
+                <p><strong>Deadline:</strong> {new Date(note.deadline).toLocaleDateString()}</p>
+            )}
+
+            <button onClick={saveNote} className="floating-button">
                 <AddIcon />
             </button>
         </div>
