@@ -486,3 +486,130 @@ html, body {
   font-weight: bold;
   margin: 0 8px;
 }
+
+
+.delete-button {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.delete-button:hover {
+  background-color: #ff1a1a;
+}
+
+
+.notification {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #4caf50; /* Зеленый для успешных сообщений */
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+  z-index: 1000;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+.notification.error {
+  background-color: #f44336; /* Красный для ошибок */
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+
+.network-status {
+  width: 24px;
+  height: 24px;
+  margin-left: 10px;
+}
+
+.theme-toggle, .logout-button {
+  margin-left: 10px;
+}
+
+
+/* Стили для компонента audio-recorder */
+audio-recorder {
+  --width: 100%; /* Растягиваем на всю ширину */
+  --height: 200px;
+  --border: 1px solid #ccc;
+  --frequency-background-color: #f9f9f9;
+  --frequency-bars-color: #4caf50;
+  --waveform-background-color: #f9f9f9;
+  --waveform-color: #ff5722;
+  --waveform-progress-color: #4caf50;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Стили для плееров аудио */
+audio {
+  width: 100%;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+/* Стили уведомлений */
+.notification {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+  z-index: 1000;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+.notification.error {
+  background-color: #f44336;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Стили для загрузочного оверлея */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-icon {
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

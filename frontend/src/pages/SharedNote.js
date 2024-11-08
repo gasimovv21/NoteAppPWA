@@ -8,6 +8,7 @@ const SharedNote = () => {
     const history = useHistory();
     const [note, setNote] = useState(null);
     const [author, setAuthor] = useState('');
+    const [notification, setNotification] = useState('');
 
     useEffect(() => {
         if (shared_id) {
@@ -22,17 +23,16 @@ const SharedNote = () => {
                 const data = await response.json();
                 setNote(data);
 
-                // Запрос к серверу для получения имени автора
                 const authorResponse = await fetch(`/api/user/${data.user}/`);
                 if (authorResponse.ok) {
                     const authorData = await authorResponse.json();
-                    setAuthor(authorData.username); // Устанавливаем имя автора
+                    setAuthor(authorData.username);
                 } else {
                     console.error("Failed to fetch author information");
                 }
             } else {
                 alert("Shared note not found or access denied.");
-                history.push('/login'); // Перенаправление на страницу входа при ошибке доступа
+                history.push('/login');
             }
         } catch (error) {
             console.error("Error fetching shared note:", error);
@@ -45,25 +45,25 @@ const SharedNote = () => {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                    'Content-Type': 'application/json'
-                }
+                    'Content-Type': 'application/json',
+                },
             });
 
             if (response.ok) {
-                alert("Note saved successfully.");
+                setNotification('Shared note saved successfully!');
+                setTimeout(() => setNotification(''), 3000);
                 history.push('/');
             } else {
-                console.error("Failed to save the shared note.");
+                console.error('Failed to save the shared note.');
             }
         } catch (error) {
-            console.error("Error saving shared note:", error);
+            console.error('Error saving shared note:', error);
         }
     };
 
     return (
         <div className="note">
             <div className="note-header">
-                {/* Кнопка назад возвращает на домашнюю страницу */}
                 <button onClick={() => history.push('/')} className="back-button">
                     <ArrowLeft />
                 </button>
@@ -76,13 +76,15 @@ const SharedNote = () => {
                 style={{ width: '100%', height: '200px', marginBottom: '10px' }}
             ></textarea>
 
-            {note?.deadline && (
-                <p><strong>Deadline:</strong> {new Date(note.deadline).toLocaleDateString()}</p>
-            )}
-
             <button onClick={saveNote} className="floating-button">
                 <AddIcon />
             </button>
+
+            {notification && (
+                <div className="notification">
+                    {notification}
+                </div>
+            )}
         </div>
     );
 };

@@ -1,83 +1,80 @@
 import { openDB } from 'idb';
 
-const dbPromise = openDB('notes-store', 1, {
+const DB_NAME = 'notes-db';
+const STORE_NAME = 'notes';
+
+export const initDB = async () => {
+  return await openDB(DB_NAME, 1, {
     upgrade(db) {
-        if (!db.objectStoreNames.contains('notes')) {
-            db.createObjectStore('notes', { keyPath: 'id' });
-        }
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+      }
     },
-});
+  });
+};
 
-// Функция для сохранения массива заметок в IndexedDB
-export async function saveNotesToDB(notes) {
-    const db = await dbPromise;
-    const tx = db.transaction('notes', 'readwrite');
-    const store = tx.objectStore('notes');
-    for (const note of notes) {
-        await store.put(note);  // Ждем завершения каждой операции записи
+export const saveNoteOffline = async (note) => {
+  const db = await initDB();
+  note.updatedAt = new Date().toISOString(); // Фиксация времени последнего изменения
+  await db.put(STORE_NAME, note);
+};
+
+export const getAllNotesOffline = async () => {
+  const db = await initDB();
+  return await db.getAll(STORE_NAME);
+};
+
+export const deleteNoteOffline = async (id) => {
+    const db = await initDB();
+    const note = await db.get(STORE_NAME, id);
+    if (note) {
+      note.deleted = true; // Помечаем как удалённое
+      note.updatedAt = new Date().toISOString(); // Обновляем время изменения
+      await db.put(STORE_NAME, note); // Сохраняем изменения
     }
-    await tx.done;  // Дожидаемся завершения транзакции
-}
-
-// Функция для получения всех заметок из IndexedDB
-export async function getNotesFromDB() {
-    const db = await dbPromise;
-    const tx = db.transaction('notes', 'readonly');
-    const store = tx.objectStore('notes');
-    const notes = await store.getAll();  // Получаем все заметки
-    await tx.done;  // Завершаем транзакцию
-    return notes;
-}
-
-// Функция для получения одной заметки из IndexedDB
-export async function getNoteFromDB(id) {
-    const db = await dbPromise;
-    const tx = db.transaction('notes', 'readonly');
-    const store = tx.objectStore('notes');
-    const note = await store.get(id);  // Получаем заметку по ID
-    await tx.done;  // Завершаем транзакцию
-    return note;
-}
-
-// Функция для удаления заметки из IndexedDB
-export async function deleteNoteFromDB(id) {
-    const db = await dbPromise;
-    const tx = db.transaction('notes', 'readwrite');
-    const store = tx.objectStore('notes');
-    await store.delete(id);  // Удаляем заметку
-    await tx.done;  // Завершаем транзакцию
-}
+  };
 
 
-export async function syncNotesWithServer() {
-    const db = await dbPromise;
+export const clearStore = async () => {
+  const db = await initDB();
+  db.clear(STORE_NAME);
+};
 
-    // Получение локальных заметок
-    const localNotes = await db.getAll('notes');
+export const syncOfflineNotes = async () => {
+  const db = await initDB();
+  const notes = await db.getAll(STORE_NAME);
 
-    // Получение заметок с сервера
-    const response = await fetch('/api/notes/', {
-        method: 'GET',
-        headers: {
+  for (const note of notes) {
+    if (note.deleted) {
+      try {
+        await fetch(`/api/notes/${note.id}/`, {
+          method: 'DELETE',
+          headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
-        }
-    });
+          },
+        });
+        await db.delete(STORE_NAME, note.id);
+      } catch (error) {
+        console.error(`Failed to delete note ${note.id}`, error);
+      }
+    } else {
+      try {
+        const method = note.isNew ? 'POST' : 'PUT';
+        const url = note.isNew ? '/api/notes/' : `/api/notes/${note.id}/`;
 
-    if (!response.ok) {
-        throw new Error('Failed to fetch notes from server');
+        await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify(note),
+        });
+
+        await db.delete(STORE_NAME, note.id);
+      } catch (error) {
+        console.error(`Failed to sync note ${note.id}`, error);
+      }
     }
-
-    const serverNotes = await response.json();
-
-    const tx = db.transaction('notes', 'readwrite');
-    const store = tx.objectStore('notes');
-
-    // Очистка локальных заметок и обновление с сервера
-    await store.clear();
-    for (const note of serverNotes) {
-        await store.put(note);
-    }
-
-    await tx.done;
-}
+  }
+};

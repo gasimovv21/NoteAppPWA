@@ -7,33 +7,44 @@ export default function LoginPage({ onLogin }) {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const history = useHistory();
+  const [notification, setNotification] = useState('');
+
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!navigator.onLine) {
+      setNotification('Cannot log in while offline. Please connect to the internet.');
+      setTimeout(() => setNotification(''), 3000);
+      return;
+    }
+  
     setIsLoading(true);
-
+  
     try {
-      const response = await fetch("/api/login/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
+      const response = await fetch('/api/login/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
       });
-
+  
       if (response.ok) {
         const data = await response.json();
         if (onLogin) {
           onLogin(data.token);
-          history.push("/");
+          history.push('/');
         }
       } else {
-        console.error("Login failed");
+        setNotification('Login failed. Please check your credentials.');
+        setTimeout(() => setNotification(''), 3000);
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="login-container">
@@ -63,6 +74,7 @@ export default function LoginPage({ onLogin }) {
         </button>
         <Link to="/register" className="alternate-action">Not registered yet? Register</Link>
       </form>
+      {notification && <div className="notification">{notification}</div>}
     </div>
   );
 }

@@ -25,15 +25,15 @@ let getContent = (note) => {
     }
 };
 
-const ListItem = ({ note }) => {
+const ListItem = ({ note, onDelete }) => {
     return (
-        <Link to={`/note/${note.id}`}>
-            <div className="notes-list-item">
+        <div className="notes-list-item">
+            <Link to={`/note/${note.id}`}>
                 <h3 style={{ fontWeight: 'bold' }}>{getTitle(note)}</h3>
                 <p><span>Created: {getTime(note.created)}</span> {getContent(note)}</p>
-                <p>Deadline: {note.deadline ? getTime(note.deadline) : 'No deadline'}</p>
-            </div>
-        </Link>
+            </Link>
+            <button onClick={() => onDelete(note.id)} className="delete-button">Delete</button>
+        </div>
     );
 };
 
