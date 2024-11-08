@@ -613,3 +613,54 @@ audio {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+
+
+.mic-button {
+  font-size: 24px; /* Уменьшение размера иконки */
+  position: absolute;
+  bottom: 24px;
+  right: 16px;
+  background: var(--color-lighter); /* Более светлый фон в выключенном состоянии */
+  border: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.mic-button:hover {
+  transform: scale(1.1); /* Лёгкий эффект увеличения при наведении */
+}
+
+.mic-button.recording {
+  background: var(--color-main); /* Оранжевый фон в состоянии записи */
+  animation: pulse 1.5s infinite; /* Анимация пульсации для состояния записи */
+}
+
+.mic-button > svg {
+  fill: var(--color-dark); /* Затемнённая иконка в выключенном состоянии */
+  transition: fill 0.3s ease;
+}
+
+.mic-button.recording > svg {
+  fill: var(--color-bg); /* Светлая иконка на оранжевом фоне */
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 10px rgba(255, 87, 34, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 87, 34, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(255, 87, 34, 0.5);
+  }
+}
+

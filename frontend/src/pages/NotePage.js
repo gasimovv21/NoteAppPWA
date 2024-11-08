@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { ReactComponent as ArrowLeft } from '../assets/arrow-left.svg';
 import { ReactComponent as ShareIcon } from '../assets/share.svg';
+import { ReactComponent as MicIcon } from '../assets/mic.svg'; // Импорт иконки микрофона
 import loadingIcon from '../assets/loading.svg';
 import { saveNoteOffline, getAllNotesOffline, syncOfflineNotes } from '../db';
-
 
 const NotePage = () => {
   const { id } = useParams();
@@ -13,6 +13,8 @@ const NotePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [notification, setNotification] = useState('');
+  const [isRecording, setIsRecording] = useState(false); // Для контроля записи
+  const [recognition, setRecognition] = useState(null);
 
   useEffect(() => {
     window.addEventListener('online', syncNotes);
@@ -22,6 +24,30 @@ const NotePage = () => {
       getNoteOnline();
     } else {
       getNoteOffline();
+    }
+
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognitionInstance = new SpeechRecognition();
+      recognitionInstance.lang = 'en-US'; // Установите язык
+      recognitionInstance.continuous = false;
+      recognitionInstance.interimResults = true;
+
+      recognitionInstance.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            transcript += event.results[i][0].transcript;
+          }
+        }
+        setNote(prevNote => ({ ...prevNote, body: prevNote.body + ' ' + transcript }));
+      };
+
+      recognitionInstance.onend = () => setIsRecording(false);
+
+      setRecognition(recognitionInstance);
+    } else {
+      console.warn('Speech Recognition API is not supported in this browser.');
     }
 
     return () => {
@@ -144,6 +170,15 @@ const NotePage = () => {
     }
   };
 
+  const toggleRecording = () => {
+    if (isRecording) {
+      recognition.stop();
+    } else {
+      recognition.start();
+      setIsRecording(true);
+    }
+  };
+
   return (
     <div className="note">
       <div className="note-header">
@@ -170,6 +205,13 @@ const NotePage = () => {
           <img src={loadingIcon} alt="Loading..." className="loading-icon" />
         </div>
       )}
+
+    <button 
+      onClick={toggleRecording} 
+      className={`mic-button ${isRecording ? 'recording' : ''}`}
+    >
+      <MicIcon />
+    </button>
 
       {notification && (
         <div className="notification">
