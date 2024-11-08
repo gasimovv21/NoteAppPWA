@@ -6,13 +6,10 @@ import AddButton from '../components/AddButton';
 const NotesListPage = () => {
   const [notes, setNotes] = useState([]);
   const [error, setError] = useState(null);
-  const [notification, setNotification] = useState('');
-
 
   useEffect(() => {
     if (navigator.onLine) {
       syncNotes();
-      getNotesOnline();
     } else {
       getNotesOffline();
     }
@@ -54,11 +51,8 @@ const NotesListPage = () => {
 
   const handleDeleteOffline = async (id) => {
     await deleteNoteOffline(id);
-    getNotesOffline();
-    setNotification('Note deleted successfully!');
-    setTimeout(() => setNotification(''), 3000);
+    getNotesOffline(); // Обновляем список после удаления
   };
-  
 
   return (
     <div className="notes">
@@ -71,9 +65,7 @@ const NotesListPage = () => {
           <ListItem key={index} note={note} onDelete={handleDeleteOffline} />
         ))}
       </div>
-
       <AddButton />
-      {notification && <div className="notification">{notification}</div>}
     </div>
   );
 };

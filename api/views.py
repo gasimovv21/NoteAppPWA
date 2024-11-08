@@ -4,8 +4,6 @@ import threading
 import time
 
 from django.shortcuts import get_object_or_404
-
-
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.response import Response
@@ -20,13 +18,9 @@ from .serializers import NoteSerializer
 from .utils import updateNote, getNoteDetail, deleteNote, getNotesList, createNote
 
 from django.views.decorators.csrf import csrf_exempt
-
-
 from django.contrib.auth import authenticate, login, get_user_model
-from django.http import JsonResponse
 
 User = get_user_model()
-
 
 @csrf_exempt
 def register(request):
@@ -88,7 +82,6 @@ def getNotes(request):
 @permission_classes([IsAuthenticated])
 def getNote(request, pk):
     try:
-        # Проверяем принадлежит ли заметка текущему пользователю
         note = Note.objects.get(id=pk, user=request.user)
     except Note.DoesNotExist:
         return Response({"error": "You do not have permission to access this note."}, status=status.HTTP_403_FORBIDDEN)
@@ -101,26 +94,18 @@ def getNote(request, pk):
         return deleteNote(request, pk)
 
 @api_view(['GET'])
-@permission_classes([AllowAny])  # Позволяет доступ к заметке по ссылке без авторизации
+@permission_classes([AllowAny])
 def shared_note_view(request, shared_id):
-    """
-    Декодирует shared_id, ищет связанную заметку и возвращает ее содержимое.
-    """
     try:
-        # Проверяем, существует ли заметка с данным shared_id
         shared_note = get_object_or_404(SharedNote, shared_id=shared_id)
-        
-        # Получаем заметку, связанную с данной ссылкой
         note = shared_note.note
         serializer = NoteSerializer(note, many=False)
-        
         return Response(serializer.data, status=status.HTTP_200_OK)
     except (SharedNote.DoesNotExist, ValueError, base64.binascii.Error):
         return Response({"error": "Shared note not found or access denied."}, status=status.HTTP_404_NOT_FOUND)
 
 def delete_shared_note_after_timeout(shared_id, timeout=30):
-    """Функция для удаления ссылки через заданный промежуток времени."""
-    time.sleep(timeout)  # Ждем указанное количество секунд
+    time.sleep(timeout)
     try:
         shared_note = SharedNote.objects.get(shared_id=shared_id)
         shared_note.delete()
@@ -156,15 +141,12 @@ def save_shared_note_as_new(request, shared_id):
 
         new_note = Note.objects.create(
             body=note_to_copy.body,
-            user=request.user,
-            deadline=note_to_copy.deadline  # Копируем deadline
+            user=request.user
         )
 
         return Response({"message": "Note successfully saved."}, status=status.HTTP_201_CREATED)
     except SharedNote.DoesNotExist:
         return Response({"error": "Shared note not found or access denied."}, status=status.HTTP_404_NOT_FOUND)
-
-
 
 @csrf_exempt
 def subscribe(request):
@@ -176,7 +158,6 @@ def subscribe(request):
         if not user.is_authenticated:
             return JsonResponse({'error': 'User not authenticated'}, status=401)
 
-        # Создание или обновление подписки
         subscription, created = Subscription.objects.update_or_create(
             user=user,
             defaults={'subscription_info': subscription_info}
@@ -184,21 +165,17 @@ def subscribe(request):
         return JsonResponse({'message': 'Subscription saved.'})
     
 
-
 def get_subscription_info(user) -> Optional[dict]:
-    """Функция, возвращающая данные подписки, если они есть"""
     if hasattr(user, 'subscription') and user.subscription is not None:
         return user.subscription.subscription_info
     return None
 
-
 def send_push_notification(user, title, message):
-    # Попробуем получить subscription_info для пользователя
     try:
-        subscription_info = user.subscription.subscription_info  # Получаем данные подписки
+        subscription_info = user.subscription.subscription_info
     except AttributeError:
         print(f"Subscription not found for user {user.username}")
-        return  # Завершаем, если подписки нет
+        return
 
     payload = {
         "title": title,

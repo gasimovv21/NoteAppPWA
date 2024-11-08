@@ -100,6 +100,9 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'frontend', 'build'),  # Путь к корневым файлам сборки, таким как manifest.json и logo192.png
 ]
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True

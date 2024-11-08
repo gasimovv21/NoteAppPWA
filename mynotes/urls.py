@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -19,4 +21,9 @@ urlpatterns = [
 
     # Маршрут для index.html
     path('index.html', TemplateView.as_view(template_name='index.html', content_type='text/html')),
-]
+
+    # Маршрут для idb.min.js
+    path('idb.min.js', TemplateView.as_view(template_name='idb.min.js', content_type='application/javascript')),
+
+
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

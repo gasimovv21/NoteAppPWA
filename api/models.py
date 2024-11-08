@@ -5,16 +5,15 @@ import base64
 
 User = get_user_model()
 
-
 class Note(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     body = models.TextField(blank=True, null=True)
-    deadline = models.DateField(blank=True, null=True)
+    audio_file = models.FileField(upload_to='audio/', blank=True, null=True)  # Поле для аудиофайлов
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.body[0:50]
+        return self.body[0:50] if self.body else 'Empty Note'
 
 
 class SharedNote(models.Model):
