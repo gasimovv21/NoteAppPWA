@@ -1,7 +1,9 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 import uuid
 import base64
+
+User = get_user_model()
 
 
 class Note(models.Model):
@@ -25,14 +27,3 @@ class SharedNote(models.Model):
             unique_id = base64.urlsafe_b64encode(uuid.uuid4().bytes).decode('utf-8').rstrip('=')
             self.shared_id = unique_id
         super().save(*args, **kwargs)
-
-
-class Subscription(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    subscription_info = models.JSONField()  # Хранит JSON с данными подписки
-
-
-class WebAuthnKey(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='webauthn_keys')
-    credential_id = models.CharField(max_length=255, unique=True)  # Идентификатор ключа
-    credential_data = models.BinaryField()  # Данные ключа

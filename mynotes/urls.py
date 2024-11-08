@@ -16,4 +16,7 @@ urlpatterns = [
 
     # Маршрут для service-worker.js
     path('service-worker.js', TemplateView.as_view(template_name='service-worker.js', content_type='application/javascript')),
+
+    # Маршрут для index.html
+    path('index.html', TemplateView.as_view(template_name='index.html', content_type='text/html')),
 ]

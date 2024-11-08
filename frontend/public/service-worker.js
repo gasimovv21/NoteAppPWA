@@ -32,37 +32,3 @@ self.addEventListener('fetch', event => {
         })
     );
 });
-
-self.addEventListener('push', function(event) {
-    console.log("Push event received:", event);  // Отладочный вывод
-    const data = event.data ? event.data.json() : {};
-    const title = data.title || "Новое уведомление";
-    const options = {
-        body: data.message || "У вас новое уведомление!",
-        icon: '/static/media/logo192.png',  
-        badge: '/static/media/logo512.png',  
-        data: { url: data.url || '/' }
-    };
-    event.waitUntil(self.registration.showNotification(title, options));
-});
-
-
-
-// Обработка клика по уведомлению
-self.addEventListener('notificationclick', function(event) {
-    event.notification.close();
-    const urlToOpen = event.notification.data.url;
-
-    event.waitUntil(
-        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
-            for (const client of windowClients) {
-                if (client.url === urlToOpen && 'focus' in client) {
-                    return client.focus();
-                }
-            }
-            if (clients.openWindow) {
-                return clients.openWindow(urlToOpen);
-            }
-        })
-    );
-});

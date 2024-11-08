@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Note, Subscription, SharedNote
+from .models import Note, SharedNote
 
 
 class NoteAdmin(admin.ModelAdmin):
@@ -16,12 +16,6 @@ class SharedNoteAdmin(admin.ModelAdmin):
     ordering = ('-id',)
 
 
-class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'subscription_info')
-    search_fields = ('user__username',)
-    list_filter = ('user',)
-
 
 admin.site.register(Note, NoteAdmin)
 admin.site.register(SharedNote, SharedNoteAdmin)
-admin.site.register(Subscription, SubscriptionAdmin)

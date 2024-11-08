@@ -51,7 +51,7 @@ const SharedNote = () => {
 
             if (response.ok) {
                 alert("Note saved successfully.");
-                history.push('/notes');
+                history.push('/');
             } else {
                 console.error("Failed to save the shared note.");
             }
@@ -64,7 +64,7 @@ const SharedNote = () => {
         <div className="note">
             <div className="note-header">
                 {/* Кнопка назад возвращает на домашнюю страницу */}
-                <button onClick={() => history.push('/notes')} className="back-button">
+                <button onClick={() => history.push('/')} className="back-button">
                     <ArrowLeft />
                 </button>
                 <h3 className="shared-note-title">Shared Note by {author}</h3>
