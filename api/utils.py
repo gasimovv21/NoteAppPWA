@@ -14,11 +14,11 @@ def getNoteDetail(request, pk):
 
 def createNote(request):
     data = request.data
-    audio_file = request.FILES.get('audio_file')  # Получаем аудиофайл, если он был передан
+    audio_file = request.FILES.get('audio_file')
     note = Note.objects.create(
         user=request.user,
         body=data.get('body', ''),
-        audio_file=audio_file  # Сохраняем аудиофайл
+        audio_file=audio_file
     )
     serializer = NoteSerializer(note, many=False)
     return Response(serializer.data)

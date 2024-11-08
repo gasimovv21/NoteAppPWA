@@ -96,8 +96,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'frontend', 'build', 'static'),  # Статические файлы, сгенерированные React
-    os.path.join(BASE_DIR, 'frontend', 'build'),  # Путь к корневым файлам сборки, таким как manifest.json и logo192.png
+    os.path.join(BASE_DIR, 'frontend', 'build', 'static'),
+    os.path.join(BASE_DIR, 'frontend', 'build'),
 ]
 
 MEDIA_URL = '/media/'
