@@ -270,27 +270,27 @@ a {
 }
 
 
-/* Основной контейнер для логина */
+/* The main container for the login */
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* Занимает всю высоту окна */
+  height: 100vh;
   background-color: var(--color-bg);
-  overflow: hidden; /* Отключает прокрутку */
+  overflow: hidden;
   margin: 0;
 }
 
-/* Убираем отступы у body и html */
+/* Removing the indentation from the body and html */
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%; /* Занимает всю высоту экрана */
-  overflow: hidden; /* Убираем прокрутку */
+  height: 100%;
+  overflow: hidden;
 }
 
 
-/* Форма логина */
+/* Login form */
 .login-form {
   background-color: var(--color-white);
   padding: 20px;
@@ -301,7 +301,7 @@ html, body {
   text-align: center;
 }
 
-/* Заголовок логина */
+/* Login header */
 .login-form h1 {
   font-size: 24px;
   font-weight: bold;
@@ -309,7 +309,7 @@ html, body {
   margin-bottom: 20px;
 }
 
-/* Поля ввода */
+/* Input fields */
 .input-field {
   width: 100%;
   padding: 12px;
@@ -326,7 +326,7 @@ html, body {
   outline: none;
 }
 
-/* Кнопка логина */
+/* Login button */
 .login-button {
   width: 100%;
   padding: 12px;
@@ -466,7 +466,7 @@ html, body {
 }
 
 
-/* Стили для кнопки назад */
+/* Styles for the back button */
 .back-button {
   background: none;
   border: none;
@@ -479,7 +479,7 @@ html, body {
   fill: var(--color-main);
 }
 
-/* Заголовок для Shared Note */
+/* The title for the Shared Note */
 .shared-note-title {
   font-size: 18px;
   color: var(--color-text);
@@ -507,7 +507,7 @@ html, body {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #4caf50; /* Зеленый для успешных сообщений */
+  background-color: #4caf50;
   color: white;
   padding: 10px 20px;
   border-radius: 5px;
@@ -518,7 +518,7 @@ html, body {
 }
 
 .notification.error {
-  background-color: #f44336; /* Красный для ошибок */
+  background-color: #f44336;
 }
 
 @keyframes fadeInOut {
@@ -540,9 +540,9 @@ html, body {
 }
 
 
-/* Стили для компонента audio-recorder */
+/* Styles for the audio recorder component */
 audio-recorder {
-  --width: 100%; /* Растягиваем на всю ширину */
+  --width: 100%;
   --height: 200px;
   --border: 1px solid #ccc;
   --frequency-background-color: #f9f9f9;
@@ -555,7 +555,7 @@ audio-recorder {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Стили для плееров аудио */
+/* Styles for audio players */
 audio {
   width: 100%;
   margin-top: 10px;
@@ -563,7 +563,7 @@ audio {
   border-radius: 8px;
 }
 
-/* Стили уведомлений */
+/* Notification Styles */
 .notification {
   position: fixed;
   bottom: 20px;
@@ -590,7 +590,7 @@ audio {
   100% { opacity: 0; }
 }
 
-/* Стили для загрузочного оверлея */
+/* Styles for the boot overlay */
 .loading-overlay {
   position: fixed;
   top: 0;
@@ -617,11 +617,11 @@ audio {
 
 
 .mic-button {
-  font-size: 24px; /* Уменьшение размера иконки */
+  font-size: 24px;
   position: absolute;
   bottom: 24px;
   right: 16px;
-  background: var(--color-lighter); /* Более светлый фон в выключенном состоянии */
+  background: var(--color-lighter);
   border: none;
   width: 60px;
   height: 60px;
@@ -635,21 +635,21 @@ audio {
 }
 
 .mic-button:hover {
-  transform: scale(1.1); /* Лёгкий эффект увеличения при наведении */
+  transform: scale(1.1);
 }
 
 .mic-button.recording {
-  background: var(--color-main); /* Оранжевый фон в состоянии записи */
-  animation: pulse 1.5s infinite; /* Анимация пульсации для состояния записи */
+  background: var(--color-main);
+  animation: pulse 1.5s infinite;
 }
 
 .mic-button > svg {
-  fill: var(--color-dark); /* Затемнённая иконка в выключенном состоянии */
+  fill: var(--color-dark);
   transition: fill 0.3s ease;
 }
 
 .mic-button.recording > svg {
-  fill: var(--color-bg); /* Светлая иконка на оранжевом фоне */
+  fill: var(--color-bg);
 }
 
 @keyframes pulse {

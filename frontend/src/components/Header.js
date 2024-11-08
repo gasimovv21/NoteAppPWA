@@ -10,7 +10,7 @@ export default function Header({ onLogout, isAuthenticated, theme, toggleTheme }
   const location = useLocation();
   const history = useHistory();
   const [username, setUsername] = useState("");
-  const [isOnline, setIsOnline] = useState(navigator.onLine); // Отслеживаем статус сети
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -34,7 +34,6 @@ export default function Header({ onLogout, isAuthenticated, theme, toggleTheme }
     }
   }, [isAuthenticated]);
 
-  // Обновляем статус сети при изменении
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
@@ -70,7 +69,6 @@ export default function Header({ onLogout, isAuthenticated, theme, toggleTheme }
         <button onClick={toggleTheme} className="theme-toggle">
           {theme === "light" ? <MoonIcon /> : <SunIcon />}
         </button>
-        {/* Индикатор сети */}
         {isOnline ? <WifiIcon className="network-status" /> : <NoWifiIcon className="network-status" />}
         {isAuthenticated && !isAuthPage && (
           <button onClick={onLogout} className="logout-button">

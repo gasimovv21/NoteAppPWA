@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-undef
-importScripts('idb.min.js'); // Подключаем UMD-сборку
+importScripts('idb.min.js'); // Connecting the UMD assembly
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -73,12 +73,9 @@ async function syncOfflineNotes() {
         if (response.ok) {
           const updatedNote = await response.json();
           if (method === 'PUT') {
-            // Обновляем заметку в локальной базе после успешного обновления на сервере
             await db.put('notes', updatedNote);
           } else if (method === 'POST') {
-            // Удаляем старую локальную версию
             await db.delete('notes', note.id);
-            // Добавляем новую с серверным ID
             await db.put('notes', updatedNote);
           } else {
             await db.delete('notes', note.id);

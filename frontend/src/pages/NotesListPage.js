@@ -51,7 +51,7 @@ const NotesListPage = () => {
 
   const handleDeleteOffline = async (id) => {
     await deleteNoteOffline(id);
-    getNotesOffline(); // Обновляем список после удаления
+    getNotesOffline();
   };
 
   return (

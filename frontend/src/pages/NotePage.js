@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { ReactComponent as ArrowLeft } from '../assets/arrow-left.svg';
 import { ReactComponent as ShareIcon } from '../assets/share.svg';
-import { ReactComponent as MicIcon } from '../assets/mic.svg'; // Импорт иконки микрофона
+import { ReactComponent as MicIcon } from '../assets/mic.svg';
 import loadingIcon from '../assets/loading.svg';
 import { saveNoteOffline, getAllNotesOffline, syncOfflineNotes } from '../db';
 
@@ -13,7 +13,7 @@ const NotePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [notification, setNotification] = useState('');
-  const [isRecording, setIsRecording] = useState(false); // Для контроля записи
+  const [isRecording, setIsRecording] = useState(false);
   const [recognition, setRecognition] = useState(null);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const NotePage = () => {
     if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       const recognitionInstance = new SpeechRecognition();
-      recognitionInstance.lang = 'en-US'; // Установите язык
+      recognitionInstance.lang = 'en-US'; // Language
       recognitionInstance.continuous = false;
       recognitionInstance.interimResults = true;
 
@@ -41,7 +41,6 @@ const NotePage = () => {
           }
         }
       
-        // Убираем лишние пробелы перед добавлением
         setNote(prevNote => {
           const updatedBody = (prevNote.body + ' ' + transcript).trim().replace(/\s+/g, ' ');
           return { ...prevNote, body: updatedBody };
