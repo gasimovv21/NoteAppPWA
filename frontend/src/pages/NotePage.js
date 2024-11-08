@@ -40,8 +40,14 @@ const NotePage = () => {
             transcript += event.results[i][0].transcript;
           }
         }
-        setNote(prevNote => ({ ...prevNote, body: prevNote.body + ' ' + transcript }));
+      
+        // Убираем лишние пробелы перед добавлением
+        setNote(prevNote => {
+          const updatedBody = (prevNote.body + ' ' + transcript).trim().replace(/\s+/g, ' ');
+          return { ...prevNote, body: updatedBody };
+        });
       };
+      
 
       recognitionInstance.onend = () => setIsRecording(false);
 
