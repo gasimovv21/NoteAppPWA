@@ -65,6 +65,7 @@ NoteApp is a Progressive Web App (PWA) for creating and managing notes, develope
 6. **Install frontend dependencies**:
    Navigate to the frontend directory and install dependencies:
    ```bash
+   cd NoteAppPWA-main
    cd frontend
    npm install
    npm run build
